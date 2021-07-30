@@ -1,0 +1,44 @@
+use('aggregations');
+
+// db.movies.aggregate([{$match: {"$and": [{ "imdb.rating": { "$gte" : 7 } },{ "genres": {"$nin": ["Crime", "Horror"]} },{"$or": [ {"rated": "PG"}, { "rated":"G"}] },{ "languages": {"$all": ["English", "Japanese"]} }}]}])
+
+/*
+db.movies.find(
+    { "$and": [
+        { "imdb.rating": { "$gte" : 7 } }, // Great than or equal too
+        { "genres": {"$nin": ["Crime", "Horror"]} }, // array does not contain
+        {"$or": [ {"rated": "PG"}, { "rated":"G"}] }, // or
+        { "languages": {"$all": ["English", "Japanese"]} }, // array includes
+    ]}
+    // , {"imdb": 1, "genres": 1, "rated": 1, "languages": 1, "_id": 0}
+    ).count()
+*/
+
+
+let agg = [{$match: {"$and": [{ "imdb.rating": { "$gte" : 7 } },{ "genres": {"$nin": ["Crime", "Horror"]} },{"$or": [ {"rated": "PG"}, { "rated":"G"}] },{ "languages": {"$all": ["English", "Japanese"]} }]}}]
+
+var validateLab1 = pipeline => {
+  let aggregations = db.getSiblingDB("aggregations")
+  if (!pipeline) {
+    print("var pipeline isn't properly set up!")
+  } else {
+    try {
+      var result = aggregations.movies.aggregate(pipeline).toArray().length
+      let sentinel = result
+      let data = 0
+      while (result != 1) {
+        data++
+        result = result % 2 === 0 ? result / 2 : result * 3 + 1
+      }
+      if (sentinel === 23) {
+        print("Answer is", data)
+      } else {
+        print("You aren't returning the correct number of documents")
+      }
+    } catch (e) {
+      print(e.message)
+    }
+  }
+}
+
+validateLab1(agg)

@@ -1,0 +1,40 @@
+use('sample_training');
+
+// ***Read/Find*** can use findOne or find
+db.inspections.find({"id": "Justin_Test" })
+
+/*
+// ***Create/New*** a new collection with document to set the scheme
+// Set the name of the new collection after the db.
+db.inspections.insertOne(
+{
+  "id": "Justin_Test",
+  "address": {
+    "city": "NEW YORK",
+    "zip": 10030,
+    "street": "FREDERICK DOUGLASS BLVD",
+    "number": 2655
+  }
+}
+)
+
+// ***Update*** can use update or updateMany
+db.inspections.updateMany(
+  {"id": "TestText"}, // This is the where clause
+  {$set: {"id": "Justin_Test", "testField": "Test"}} // this is what is updated or inserted
+// You can use different things to set i.e. $inc to increment
+)
+
+
+// Introduction to Data Modeling:
+// "Data should be stored in the way it will be used"
+// Upsert - Update or Insert?:
+db.iot.updateOne({ "sensor": r.sensor, "date": r.date, "valcount": { "$lt": 48 } },
+                         { "$push": { "readings": { "v": r.value, "t": r.time } }, 
+                         "$inc": { "valcount": 1, "total": r.value } },{ "upsert": true })
+
+// ***Delete*** can use deleteOne or deleteMany
+db.inspections.deleteOne(
+  {"id": "Justin_Test"}
+)
+*/

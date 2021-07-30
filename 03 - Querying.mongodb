@@ -1,0 +1,52 @@
+use('sample_training');
+// use('sample_airbnb');
+
+// The mongoDB language used is called MQL
+
+// Count
+db.inspections.count()
+// db.inspections.find({ "$and": [{"result":"Out of Business"},{"sector":"Home Improvement Contractor - 100"}]}).count()
+/*
+// sort() and limit():
+db.zips.find().sort({ "pop": 1 }).limit(1) // Ascending
+db.zips.find().sort({ "pop": -1 }).limit(10) // Desending
+db.trips.find({ "birth year": { "$ne": "" }}).sort({ "birth year": -1 }).limit(1)
+
+// Query Operators - Comparison:
+// $eq, $gt, $gte, $in, $lt, $lte, $ne, $nin, $size
+db.trips.find({ "tripduration": { "$lte" : 70 }, "usertype": { "$ne": "Subscriber" } })
+db.listingsAndReviews.find({ "$and":[{"accommodates": {"$gt":6}},{ "reviews": { "$size": 50}}]})
+
+// Query Operators - Logical:
+// $and, $not, $nor, $or
+db.inspections.find({ "$and": [{"result":"Out of Business"},{"sector":"Home Improvement Contractor - 100"}]}).count()
+db.zips.find({ "$nor": [ {"pop": { "$gt": 1000000 }},{"pop": { "$lt": 5000 }} ]}).count()
+db.companies.find({ "$or": [{ "$and": [{"founded_month": 10},{ "$or": [{"category_code": "social"},{"category_code": "web"}]}]},{ "$and": [{"founded_year": 2004},{ "$or": [{"category_code": "social"},{"category_code": "web"}]}]}]}).count()
+db.routes.find({ "$and": [ { "$or" :[ { "dst_airport": "KZN" },{ "src_airport": "KZN" }] },
+                          { "$or" :[ { "airplane": "CR2" },{ "airplane": "A81" } ] }]})
+
+// Expressive Query Operator - Used to compare values within a document:
+db.companies.find({ "$expr": {"$eq": [ "$permalink", "$twitter_username"]}}).count()
+db.trips.find({ "$expr": { "$and": [ { "$gt": [ "$tripduration", 1200 ]},
+                         { "$eq": [ "$end station id", "$start station id" ]}]}})
+
+// Array Operators:
+db.listingsAndReviews.find({ "amenities": { "$size": 20, "$all": [ "Internet", "Wifi",  "Kitchen" ]}})
+
+// Projection Operators - brings back ONLY the fields with a '1' declared:
+db.listingsAndReviews.find({ "amenities": "Wifi" },{ "price": 1, "address": 1})
+
+// elemMatch Operator - Matches documents that contain an array field with at least one element that matches all the specified query criteria.
+db.grades.find({ "scores": { "$elemMatch": { "type": "extra credit" } }})
+db.companies.find({"offices": { "$elemMatch": { "city": "Seattle" } }}).count()
+
+// Sub-Document Operator - This uses 'dot notation' to pick an array to search in.
+db.inspections.find({"Address.city": "NEW YORK" }).count()
+db.companies.find({ "relationships.0.person.last_name": "Zuckerberg" },{ "name": 1 })
+
+// Aggregation Framework:
+db.listingsAndReviews.aggregate([ { "$project": { "room_type": 1, "_id": 0 }},{ "$group": { "_id": "$room_type" }}])
+
+// Example below is grouping the data to use 'sum'
+db.listingsAndReviews.aggregate([ { "$project": { "address": 1, "_id": 0 }}, { "$group": { "_id": "$address.country", "count": { "$sum": 1 } } } ])
+*/
