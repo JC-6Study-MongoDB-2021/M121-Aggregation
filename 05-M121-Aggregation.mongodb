@@ -1,8 +1,10 @@
 use('aggregations');
 
-// db.movies.aggregate([{$match: {"$and": [{ "imdb.rating": { "$gte" : 7 } },{ "genres": {"$nin": ["Crime", "Horror"]} },{"$or": [ {"rated": "PG"}, { "rated":"G"}] },{ "languages": {"$all": ["English", "Japanese"]} }}]}])
-
+// Match
 /*
+db.movies.aggregate([{$match: {"$and": [{ "imdb.rating": { "$gte" : 7 } },{ "genres": {"$nin": ["Crime", "Horror"]} },{"$or": [ {"rated": "PG"}, { "rated":"G"}] },{ "languages": {"$all": ["English", "Japanese"]} }]}}])
+
+// Practice with a FIND to establish the MATCH criteria
 db.movies.find(
     { "$and": [
         { "imdb.rating": { "$gte" : 7 } }, // Great than or equal too
@@ -12,8 +14,6 @@ db.movies.find(
     ]}
     // , {"imdb": 1, "genres": 1, "rated": 1, "languages": 1, "_id": 0}
     ).count()
-*/
-
 
 let agg = [{$match: {"$and": [{ "imdb.rating": { "$gte" : 7 } },{ "genres": {"$nin": ["Crime", "Horror"]} },{"$or": [ {"rated": "PG"}, { "rated":"G"}] },{ "languages": {"$all": ["English", "Japanese"]} }]}}]
 
@@ -42,3 +42,86 @@ var validateLab1 = pipeline => {
 }
 
 validateLab1(agg)
+*/
+
+/*
+db.movies.aggregate([
+  {$match: {"$and": [{ "imdb.rating": { "$gte" : 7 } },{ "genres": {"$nin": ["Crime", "Horror"]} },{"$or": [ {"rated": "PG"}, { "rated":"G"}] },{ "languages": {"$all": ["English", "Japanese"]} }]}},
+  { $project: {_id:0, title: 1, rated: 1}}])
+
+
+
+let agg = [{$match: {"$and": [{ "imdb.rating": { "$gte" : 7 } },{ "genres": {"$nin": ["Crime", "Horror"]} },{"$or": [ {"rated": "PG"}, { "rated":"G"}] },{ "languages": {"$all": ["English", "Japanese"]} }]}},{ $project: {_id:0, title: 1, rated: 1}}]
+
+var validateLab2 = pipeline => {
+  let aggregations = db.getSiblingDB("aggregations")
+  if (!pipeline) {
+    print("var pipeline isn't properly set up!")
+  } else {
+    try {
+      let resultsExplain = aggregations.movies.aggregate(pipeline, {
+        explain: true
+      })
+      let result = aggregations.movies.aggregate(pipeline).toArray().length
+      let data = 0
+      while (result != 1) {
+        data++
+        result = result % 2 === 0 ? result / 2 : result * 3 + 1
+      }
+      let { _id, title, rated } = resultsExplain.stages.pop()["$project"]
+      return title && rated && !_id
+        ? print("Answer is", data)
+        : print("Your $project stage doesn't seem correct")
+    } catch (e) {
+      print(e.message)
+    }
+  }
+}
+
+validateLab2(agg)
+*/
+
+/*
+db.movies.aggregate([
+  { $project : 
+    { _id: 0, "arrTitle": { $size:{ $split: [ "$title", " " ] } } }
+  }, 
+  { $match: { "arrTitle": 1 } } 
+ ]).itcount()
+*/
+
+//make sure that the field is an array, and that it is not empty
+// db.movies.aggregate([{ $match: { writers: { $elemMatch: { $exists: true } } } }])
+// db.movies.findOne({title: "Life Is Beautiful"}, { _id: 0, cast: 1, writers: 1})
+/*
+// I could not get this working
+db.movies.aggregate([{
+writers: {
+  $map: {
+    input: "$writers",
+    as: "writer",
+    in: {
+      $arrayElemAt: [
+        {
+          $split: [ "$$writer", " (" ]
+        },
+        0
+      ]
+    }
+  }
+}
+}]
+*/
+
+/*
+// Checks to see if all these arrays have common values in them.
+// counts 1259 but it says it should be 1596 -- counld not figure this out
+db.movies.aggregate([
+{ "$project": { 
+            "commonToAll": { "$setIntersection": [ "$cast", "$directors", "$writers" ] }, 
+            }
+},
+{ $match: { commonToAll: { $elemMatch: { $ne: [] } } } }
+
+]).itcount()
+*/
