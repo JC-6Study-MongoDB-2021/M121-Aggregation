@@ -3,26 +3,26 @@ use('aggregations');
 // --- Chapter 4 --- \\
 // Lab 1
 db.movies.aggregate([
-{ $match : { 
+{ $match : 
+	{ 
 	    "imdb.rating" : { $gt : 0 },
         "metacritic" : { $gt : 0 }
-		}		
-	},
-    { $facet : { 
-	    "topTenImdb" : [		
-			{ $sort : { "imdb.rating" : -1 } },
-			{ $limit : 10 }
-		],
-		"topTenMetacritic" : [
-			{ $sort : { "metacritic" : -1 } },
-			{ $limit : 10 }
-	    ]}
-	},
-	{ $project : {
-	    "commonTopFilms" : {
-			$size : {
+	}		
+},
+{ $facet : 
+	{ 
+	    "topTenImdb" : [ { $sort : { "imdb.rating" : -1 } }, { $limit : 10 } ],
+		"topTenMetacritic" : [ { $sort : { "metacritic" : -1 } }, { $limit : 10 } ]
+	}
+},
+{ $project : 
+	{
+	    "commonTopFilms" : 
+		{ $size : 
+			{
 				$setIntersection : [ "$topTenImdb", "$topTenMetacritic" ]
 			}
 		}	
 	}
+}
 ])
