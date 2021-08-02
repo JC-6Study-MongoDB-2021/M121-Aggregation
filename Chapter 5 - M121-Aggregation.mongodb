@@ -1,0 +1,7 @@
+use('aggregations');
+
+// --- Chapter 5 --- \\
+// Lab 1
+db.movies.aggregate([
+
+])

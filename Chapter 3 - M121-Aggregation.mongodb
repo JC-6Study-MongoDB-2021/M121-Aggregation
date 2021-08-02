@@ -1,0 +1,91 @@
+use('aggregations');
+
+// --- Chapter 3 --- \\
+// Lab 1
+db.movies.aggregate([
+{ $match : { "awards" : { $regex : /Won \d+ Oscar/ } } },
+	{ $group : { 
+	    "_id" : null,
+	    "highest_rating" : { $max : "$imdb.rating" },
+		"lowest_rating" : { $min : "$imdb.rating" },
+		"average_rating" : { $avg : "$imdb.rating" },
+		"deviation" : { $stdDevSamp : "$imdb.rating" }
+		}
+	}
+])
+
+// Lab 2
+db.movies.aggregate([
+{ $unwind : "$cast" },
+	{ $group: { 
+	    "_id" : "$cast", 
+		"numFilms" : { $sum : 1 },
+		"average" : { $avg : "$imdb.rating" }
+		}
+	},
+	{ $sort : { "numFilms" : -1 } },
+	{ $limit : 1 }
+])
+
+// Lab 3
+db.air_alliances.aggregate([
+{ $unwind : "$airlines" },
+    { $lookup: {
+            from: "air_routes",
+            localField: "airlines",
+            foreignField: "airline.name",
+            as: "routes"
+        }
+    },
+    { $unwind : "$routes" },
+	{ $match : { "routes.airplane" : { $in : [ "747", "380" ] } } },
+    { $group : {
+		"_id" : "$name",
+		"routes_count" : { $sum : 1 } 
+	    }
+	},
+	{ $sort : {"routes_count" : -1 } }
+])
+
+// Lab 4
+db.air_alliances.aggregate([
+{
+      $match: { name: "OneWorld" }
+    }, {
+      $graphLookup: {
+        startWith: "$airlines",
+        from: "air_airlines",
+        connectFromField: "name",
+        connectToField: "name",
+        as: "airlines",
+        maxDepth: 0,
+        restrictSearchWithMatch: {
+          country: { $in: ["Germany", "Spain", "Canada"] }
+        }
+      }
+    }, {
+      $graphLookup: {
+        startWith: "$airlines.base",
+        from: "air_routes",
+        connectFromField: "dst_airport",
+        connectToField: "src_airport",
+        as: "connections",
+        maxDepth: 1
+      }
+    }, {
+      $project: {
+        validAirlines: "$airlines.name",
+        "connections.dst_airport": 1,
+        "connections.airline.name": 1
+      }
+    },
+    { $unwind: "$connections" },
+    {
+      $project: {
+        isValid: { $in: ["$connections.airline.name", "$validAirlines"] },
+        "connections.dst_airport": 1
+      }
+    },
+    { $match: { isValid: true } },
+    { $group: { _id: "$connections.dst_airport" } }
+])
